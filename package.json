@@ -1,0 +1,22 @@
+{
+  "name": "blog-list",
+  "version": "1.0.0",
+  "description": "FSO Part-4",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamzaomer11/Part-4.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hamzaomer11/Part-4/issues"
+  },
+  "homepage": "https://github.com/hamzaomer11/Part-4#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
