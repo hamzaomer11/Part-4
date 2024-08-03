@@ -34,6 +34,19 @@ app.get('/api/blogs', (request, response) => {
     })
 })
 
+app.get('/api/blogs/:id', (request, response, next) => {
+    Blog
+    .findById(request.params.id)
+      .then((blog) => {
+        if (blog) {
+          response.json(blog);
+        } else {
+          response.status(404).end();
+        }
+      })
+      .catch((error) => next(error));
+});
+
 app.post('/api/blogs', (request, response) => {
   const blog = new Blog(request.body)
 
@@ -43,6 +56,14 @@ app.post('/api/blogs', (request, response) => {
       response.status(201).json(result)
     })
 })
+
+blogSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+      returnedObject.id = returnedObject._id.toString();
+      delete returnedObject._id;
+      delete returnedObject.__v;
+    },
+  });
 
 const { PORT } = process.env
 app.listen(PORT, () => {
