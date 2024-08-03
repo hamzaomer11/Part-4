@@ -1,8 +1,10 @@
-require('dotenv').config();
 const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
+
+const config = require('./utils/config')
+const logger = require('./utils/logger')
 
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -63,9 +65,9 @@ blogSchema.set('toJSON', {
       delete returnedObject._id;
       delete returnedObject.__v;
     },
-  });
+});
 
 const { PORT } = process.env
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+   logger.info(`Server running on port ${config.PORT}`)
 })
