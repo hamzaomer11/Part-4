@@ -8,10 +8,13 @@ const totalLikes = (array) => {
         return 0
     }
 
-    for(const i in array) {
-        return array[i].likes;
+    const reducer = (sum, item) => {
+        console.log(item, 'items data type: ')
+        return sum + item.likes
     }
-
+      
+    return array.reduce(reducer, 0)
+    
 }
   
 module.exports = {
