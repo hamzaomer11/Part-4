@@ -4,10 +4,6 @@ const dummy = (blogs) => {
 
 const totalLikes = (array) => {
 
-    if(array.length === 0) {
-        return 0
-    }
-
     const reducer = (sum, item) => {
         console.log(item, 'items data type: ')
         return sum + item.likes
