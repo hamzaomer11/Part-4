@@ -29,10 +29,19 @@ const mostBlog = (array) => {
     const drop = lodash.pick(mostBlogs, ['author', 'blogs'])
     return drop
 }
+
+const mostLikes = (array) => {
+    const max = array.reduce((previous, current) => (previous.likes > current.likes) 
+    ? previous 
+    : current)
+    const drop = lodash.pick(max, ['author', 'likes'])
+    return drop
+}
   
 module.exports = {
    dummy,
    totalLikes,
    favouriteBlog,
-   mostBlog
+   mostBlog,
+   mostLikes
 }
