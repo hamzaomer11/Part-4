@@ -15,6 +15,14 @@ const initialBlogs = [
     },
 ]
 
+beforeEach(async () => {
+    await Blog.deleteMany({})
+    let blogObject = new Blog(helper.initialBlogs[0])
+    await blogObject.save() 
+    blogObject = new Blog(helper.initialBlogs[1])
+    await blogObject.save() 
+})
+
 const blogsInDb = async () => {
     const blogs = await Blog.find({})
     return blogs.map(blog => blog.toJSON())

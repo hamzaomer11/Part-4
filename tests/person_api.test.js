@@ -10,14 +10,6 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-beforeEach(async () => {
-    await Blog.deleteMany({})
-    let blogObject = new Blog(helper.initialBlogs[0])
-    await blogObject.save() 
-    blogObject = new Blog(helper.initialBlogs[1])
-    await blogObject.save() 
-})
-
 test.only('there are two blogs', async () => {
     const response = await api.get('/api/blogs')
     assert.strictEqual(response.body.length, helper.initialBlogs.length)
