@@ -59,3 +59,21 @@ test.only('a valid blog can be added ', async () => {
     const titles = blogAtEnd.map(b => b.title)
     assert(titles.includes('HIJ'))
 })
+
+test.only('like property defaults to 0 if missing', async () => {
+    const newBlog = {
+        title: "HIJ",
+        author: "HIJ",
+        url: "http://www.hij.com",
+      }
+    
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    
+      const blogAtEnd = await helper.blogsInDb()
+      const blogLikes = blogAtEnd.map(blog => blog.likes)
+      assert(blogLikes.includes(0))
+ })
