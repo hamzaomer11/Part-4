@@ -76,4 +76,22 @@ test.only('like property defaults to 0 if missing', async () => {
       const blogAtEnd = await helper.blogsInDb()
       const blogLikes = blogAtEnd.map(blog => blog.likes)
       assert(blogLikes.includes(0))
- })
+})
+
+test.only('respond with 400 bad request if title/url properties are missing', async () => {
+    const newBlog = {
+        title: "",
+        author: "KLM",
+        url: "http://www.klm.com",
+        likes: 100
+    }
+    
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+    
+    const blogAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
+})
