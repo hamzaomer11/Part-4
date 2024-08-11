@@ -123,6 +123,6 @@ test.only('update succeeds with status code 200 if id is valid'), async () => {
     const blogAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
 
-    const contents = blog.map(blog => blog.likes)
+    const contents = blogAtEnd.map(blog => blog.likes)
     assert(contents.includes(blogToUpdate.likes))
 }
