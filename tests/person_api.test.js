@@ -112,3 +112,17 @@ test.only('succeeds with status code 204 if id is valid', async () => {
     assert(!contents.includes(blogtoDelete.title))
 })
 
+test.only('update succeeds with status code 200 if id is valid'), async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .expect(200)
+
+    const blogAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
+
+    const contents = blog.map(blog => blog.likes)
+    assert(contents.includes(blogToUpdate.likes))
+}
