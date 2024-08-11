@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test')
+const { test, beforeEach} = require('node:test')
 const assert = require("node:assert");
 const mongoose = require('mongoose')
 const supertest = require('supertest')
@@ -95,3 +95,20 @@ test.only('respond with 400 bad request if title/url properties are missing', as
     const blogAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
 })
+
+test.only('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogtoDelete = blogsAtStart[0]
+
+    await api
+    .delete(`/api/blogs/${blogtoDelete.id}`)
+    .expect(204)
+
+    const blogAtEnd = await helper.blogsInDb()
+
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length - 1)
+
+    const contents = blogAtEnd.map(blog => blog.title)
+    assert(!contents.includes(blogtoDelete.title))
+})
+
