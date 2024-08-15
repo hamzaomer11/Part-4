@@ -7,6 +7,7 @@ const app = require('../app')
 const helper = require('./test_helper')
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -126,3 +127,36 @@ test.only('update succeeds with status code 200 if id is valid'), async () => {
     const contents = blogAtEnd.map(blog => blog.likes)
     assert(contents.includes(blogToUpdate.likes))
 }
+
+test.only('invalid user is not created', async () => {
+    const newUser = {
+        username: "",
+        name: "KLM",
+        password: ""
+    }
+        
+    await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+        
+    const userAtEnd = await helper.usersInDb()
+    assert.strictEqual(userAtEnd.length, helper.initialUsers.length)
+})
+
+test.only('respond with 400 status-code & error message if invalid user/password is added', async () => {
+    const newUser = {
+        username: "",
+        name: "KLM",
+        password: ""
+    }
+        
+    const result = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+        
+    assert(result.body.error.includes('invalid username or password'))
+})
