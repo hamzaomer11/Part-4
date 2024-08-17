@@ -17,7 +17,11 @@ const initialBlogs = [
 ]
 
 const initialUsers = [
-
+    {
+        "username": "rootUser",
+        "name": "root",
+        "password": "rootUser"
+    }
 ]
 
 const blogsInDb = async () => {

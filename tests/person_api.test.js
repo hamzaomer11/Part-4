@@ -3,9 +3,7 @@ const assert = require("node:assert");
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-
 const helper = require('./test_helper')
-
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
@@ -16,7 +14,15 @@ beforeEach(async () => {
     let blogObject = new Blog(helper.initialBlogs[0])
     await blogObject.save() 
     blogObject = new Blog(helper.initialBlogs[1])
-    await blogObject.save() 
+    await blogObject.save()
+    
+    /** Exercise 4.23 - Start */
+
+    await api
+    .post('/api/users')
+    .send(helper.initialUsers[0])
+
+    /** Exercise 4.23 - End */
 })
 
 test.only('there are two blogs', async () => {
@@ -44,11 +50,25 @@ test.only('a valid blog can be added ', async () => {
         url: "http://www.hij.com",
         likes: 200
     }
+
+    /** Exercise 4.23 - Start*/
+    
+    const response = await api
+      .post('/api/login')
+      .send({username: helper.initialUsers[0].username, password: helper.initialUsers[0].password})
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const token = response.body.token
+
+    /** Exercise 4.23 - End*/
+
     
     /** making an HTTP POST request to the /api/blogs URL successfully creates a new blog post */
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
   
@@ -68,9 +88,22 @@ test.only('like property defaults to 0 if missing', async () => {
         url: "http://www.hij.com",
       }
     
+    /** Exercise 4.23 - Start*/
+    
+        const response = await api
+        .post('/api/login')
+        .send({username: helper.initialUsers[0].username, password: helper.initialUsers[0].password})
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+        const token = response.body.token
+
+    /** Exercise 4.23 - End*/
+
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
     
@@ -87,12 +120,25 @@ test.only('respond with 400 bad request if title/url properties are missing', as
         likes: 100
     }
     
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-        .expect('Content-Type', /application\/json/)
+    /** Exercise 4.23 - Start*/
     
+    const response = await api
+    .post('/api/login')
+    .send({username: helper.initialUsers[0].username, password: helper.initialUsers[0].password})
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    const token = response.body.token
+
+    /** Exercise 4.23 - End*/
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
     const blogAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
 })
