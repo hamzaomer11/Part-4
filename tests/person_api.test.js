@@ -213,3 +213,15 @@ test.only('respond with 400 status-code & error message if invalid user/password
         
     assert(result.body.error.includes('invalid username or password'))
 })
+
+test.only('blog fails with status code 401 Unauthorized if no token provided', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogtoDelete = blogsAtStart[2]
+
+    await api
+        .delete(`/api/blogs/${blogtoDelete.id}`)
+        .expect(401)
+
+    const blogAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length + 1)
+})
