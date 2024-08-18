@@ -9,25 +9,46 @@ const User = require('../models/user')
 
 const api = supertest(app)
 
+let token;
+
 beforeEach(async () => {
+
     await Blog.deleteMany({})
-    let blogObject = new Blog(helper.initialBlogs[0])
-    await blogObject.save() 
-    blogObject = new Blog(helper.initialBlogs[1])
-    await blogObject.save()
+    await User.deleteMany({})
     
-    /** Exercise 4.23 - Start */
+    const newUser = {
+    username: "rootUser",
+    password: "rootUser",
+    }
 
     await api
-    .post('/api/users')
-    .send(helper.initialUsers[0])
+    .post("/api/users")
+    .send(newUser)
 
-    /** Exercise 4.23 - End */
+    await Blog.insertMany(helper.initialBlogs)
+
+    const result = await api
+    .post("/api/login")
+    .send(newUser)
+
+    token = result.body.token
+
+    const newTestBlog = {
+        title: "HIJ",
+        author: "HIJ",
+        url: "http://www.hij.com",
+        likes: 300
+    }
+
+    await api
+    .post("/api/blogs")
+    .set('Authorization', `Bearer ${token}`)
+    .send(newTestBlog)
 })
 
 test.only('there are two blogs', async () => {
     const response = await api.get('/api/blogs')
-    assert.strictEqual(response.body.length, helper.initialBlogs.length)
+    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1) /** Modified for Exercise 4.23 */
 })
   
 test.only('the first blog is about ABC', async () => {
@@ -74,7 +95,7 @@ test.only('a valid blog can be added ', async () => {
   
     /** verifying that the total number of blogs in the system is increased by one */
     const blogAtEnd = await helper.blogsInDb()
-    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length + 1)
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length + 2) /** Modified for Exercise 4.23 */
     
     /** verifying that the content of the blog post is saved correctly to the database */
     const titles = blogAtEnd.map(b => b.title)
@@ -140,39 +161,25 @@ test.only('respond with 400 bad request if title/url properties are missing', as
       .expect('Content-Type', /application\/json/)
 
     const blogAtEnd = await helper.blogsInDb()
-    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length + 1) /** Modified for Exercise 4.23 */
 })
 
 test.only('succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const blogtoDelete = blogsAtStart[0]
+    const blogtoDelete = blogsAtStart[2]
 
     await api
-    .delete(`/api/blogs/${blogtoDelete.id}`)
-    .expect(204)
+        .delete(`/api/blogs/${blogtoDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204)
 
     const blogAtEnd = await helper.blogsInDb()
 
-    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length - 1)
+    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
 
     const contents = blogAtEnd.map(blog => blog.title)
     assert(!contents.includes(blogtoDelete.title))
 })
-
-test.only('update succeeds with status code 200 if id is valid'), async () => {
-    const blogsAtStart = await helper.blogsInDb()
-    const blogToUpdate = blogsAtStart[0]
-
-    await api
-    .put(`/api/blogs/${blogToUpdate.id}`)
-    .expect(200)
-
-    const blogAtEnd = await helper.blogsInDb()
-    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length)
-
-    const contents = blogAtEnd.map(blog => blog.likes)
-    assert(contents.includes(blogToUpdate.likes))
-}
 
 test.only('invalid user is not created', async () => {
     const newUser = {

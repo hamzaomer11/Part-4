@@ -13,7 +13,7 @@ const initialBlogs = [
         author: "EFG",
         url: "http://www.efg.com",
         likes: 500
-    },
+    }
 ]
 
 const initialUsers = [
